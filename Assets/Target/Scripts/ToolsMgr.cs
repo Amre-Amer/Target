@@ -1,16 +1,179 @@
+using System.IO;
 using UnityEngine;
 
 public class ToolsMgr : MonoBehaviour
 {
     public GlobalsMgr g;
+
+    void Start()
+    {
+        // CheckFolder(g.pathImageData);
+        return;
+        g.posNormal = new(.5f, .5f, .5f);
+        SetClassification();
+        // SetClassification2();
+        Debug.Log(g.posNormal.x.ToString("F2") + ", " + g.posNormal.y.ToString("F2") + ", " + g.posNormal.z.ToString("F2") + " g.nClassification: " + g.nClassification + "\n");    
+
+        g.posNormal = new(.95f, .95f, .95f);
+        SetClassification();
+        // SetClassification2();
+        Debug.Log(g.posNormal.x.ToString("F2") + ", " + g.posNormal.y.ToString("F2") + ", " + g.posNormal.z.ToString("F2") + " g.nClassification: " + g.nClassification + "\n");    
+
+        g.posNormal = new(.25f, .25f, .25f);
+        SetClassification();
+        // SetClassification2();
+        Debug.Log(g.posNormal.x.ToString("F2") + ", " + g.posNormal.y.ToString("F2") + ", " + g.posNormal.z.ToString("F2") + " g.nClassification: " + g.nClassification + "\n");    
+    }
+
+    public void CheckFolder(string pathspec)
+    {
+        if (!Directory.Exists(pathspec))
+        {
+            Directory.CreateDirectory(pathspec);
+            Debug.Log("Created folder at: " + pathspec);
+        }  else
+        {
+            Debug.Log("Existing folder at: " + pathspec);
+        }
+    }
+
+    public void ResetFolders()
+    {
+        CleanClassFolder();
+        CreateClassFolder();
+        CreateClassSubFolders();
+    }
+
+    void CleanClassFolder()
+    {
+        CleanFolder(g.pathImageData);        
+    }
+
+    void CleanFolder(string pathspec)
+    {
+        if (!Directory.Exists(pathspec))
+        {
+            //Directory.Delete(pathspec);
+            Debug.Log("Deleted folder at: " + pathspec);
+        }
+    }
+
+    void CreateClassFolder()
+    {
+        CheckFolder(g.pathImageData);
+    }
+
+    void CreateClassSubFolders()
+    {
+        for(int n = 0; n < g.numClasses; n++)
+        {
+            g.nClassification = n;
+            SetPathClass();
+            string pathFolder = Path.Combine(g.pathImageData, g.pathClass);
+            CheckFolder(pathFolder);
+        }
+    }
+
+    public void GrabImage()
+    {
+        g.textureGrabbed = g.matDisplay.mainTexture as Texture2D;
+    }
+
+    public void SaveImage()
+    {
+        g.filename = g.pathClass + ".png";
+        g.filespec = Path.Combine(g.pathImageData, g.pathClass, g.filename);
+        g.bytes = g.textureGrabbed.EncodeToPNG();
+        File.WriteAllBytes(g.filespec, g.bytes);
+        Debug.Log("SaveImage: " + g.filespec + "\n");
+    }
+
+    public void SetClassification2()
+    {
+        //  6   7   8
+        //  3   4   5
+        //  0   1   2
+        g.nClassification = -1;
+        int s = (int)Mathf.Sqrt(g.numClasses);
+        float ix = (int)(g.posNormal.x * s);
+        float iy = (int)(g.posNormal.y * s);
+
+        Debug.Log("ix,iy: " + ix + ", " + iy + " g.nClassification: " + g.nClassification + "\n");
+    }
+
+    public void SetClassification()
+    {
+        //  6   7   8
+        //  3   4   5
+        //  0   1   2
+        g.nClassification = -1;
+        if (g.posNormal.x < .33f)
+        { 
+            if (g.posNormal.y < .33f)
+            {
+                g.nClassification = 0;
+            } else
+            {
+                if (g.posNormal.y < .67f)
+                {
+                    g.nClassification = 3;
+                } else
+                {
+                    g.nClassification = 6;
+                }
+            }         
+        } else
+        {
+            if (g.posNormal.x < .67f)
+            {
+                if (g.posNormal.y < .33f)
+                {
+                    g.nClassification = 1;
+                    
+                } else
+                {
+                    if (g.posNormal.y < .67f)
+                    {
+                        g.nClassification = 4;
+                    } else
+                    {
+                        g.nClassification = 7;
+                    }
+                }         
+            } else
+            {
+                if (g.posNormal.y < .33f)
+                {
+                    g.nClassification = 2;
+                } else
+                {
+                    if (g.posNormal.y < .67f)
+                    {
+                        g.nClassification = 5;
+                    } else
+                    {
+                        g.nClassification = 8;
+                    }
+                }         
+            }
+        }
+        SetPathClass();
+    }
+
+    public void SetPathClass()
+    {
+        g.pathClass = "class_" + g.nClassification;
+    }
+
     public Vector3 GetTargetPosition()
     {
-        Vector3 posScreen = GetPosScreen(g.target.transform.position);
-        Debug.Log("posScreen: " + posScreen + "\n");
-        Vector3 posNormal = Normalize(posScreen);
-        string txt = PosToString(posNormal);
+        g.posScreen = GetPosScreen(g.target.transform.position);
+        g.posNormal = Normalize(g.posScreen);
+
+        string txt = PosToString(g.posNormal);
         SetInfo(txt);
-        Vector3 posTarget = GetPosTarget(posScreen);
+        
+        Vector3 posTarget = GetPosTarget(g.posScreen);
         return posTarget;
     } 
     Vector3 GetPosTarget(Vector3 posScreen)
@@ -58,7 +221,7 @@ public class ToolsMgr : MonoBehaviour
     void SetInfo(string txt)
     {
         g.textInfo.text = txt;
-        Debug.Log(txt + "\n");
+        // Debug.Log(txt + "\n");
     }
 
     string PosToString(Vector3 pos)

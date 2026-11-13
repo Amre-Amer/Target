@@ -3,15 +3,26 @@ using UnityEngine;
 public class TargetMgr : MonoBehaviour
 {
     public GlobalsMgr g;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+
     void Start()
     {
-        
+        if (g.ynTrain)
+        {
+            g.trainMgr.StartTraining();
+        } else
+        {
+            
+        }
     }
 
-    // Update is called once per frame
     void Update()
     {
-        
+        if (g.ynTrain)
+        {
+            g.trainMgr.AddTrainingData();
+        } else
+        {
+            
+        }
     }
 }
