@@ -3,15 +3,14 @@ using UnityEngine;
 public class TrainMgr : MonoBehaviour
 {
     public GlobalsMgr g;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+
+    void StartTraining()
     {
-        
+        Debug.Log("StartTraining\n");
     }
 
-    // Update is called once per frame
-    void Update()
+    public void AddTrainingData()
     {
-        
+        Debug.Log("AddTrainingData\n");
     }
 }
