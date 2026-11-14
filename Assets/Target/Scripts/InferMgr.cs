@@ -3,15 +3,22 @@ using UnityEngine;
 public class InferMgr : MonoBehaviour
 {
     public GlobalsMgr g;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+
+    public void StartInference()
     {
         
     }
 
-    // Update is called once per frame
-    void Update()
+    public void Infer()
     {
-        
+        g.toolsMgr.GrabImage();
+        Inference();
+        g.toolsMgr.AddTally();
+        g.toolsMgr.ShowTally();
+    }
+
+    void Inference()
+    {
+        g.nClassification = Random.Range(0, g.numClasses);
     }
 }

@@ -5,35 +5,43 @@ public class ToolsMgr : MonoBehaviour
 {
     public GlobalsMgr g;
 
-    void Start()
+    void TestClassification()
     {
-        // CheckFolder(g.pathImageData);
-        return;
         g.posNormal = new(.5f, .5f, .5f);
         SetClassification();
-        // SetClassification2();
         Debug.Log(g.posNormal.x.ToString("F2") + ", " + g.posNormal.y.ToString("F2") + ", " + g.posNormal.z.ToString("F2") + " g.nClassification: " + g.nClassification + "\n");    
 
         g.posNormal = new(.95f, .95f, .95f);
         SetClassification();
-        // SetClassification2();
         Debug.Log(g.posNormal.x.ToString("F2") + ", " + g.posNormal.y.ToString("F2") + ", " + g.posNormal.z.ToString("F2") + " g.nClassification: " + g.nClassification + "\n");    
 
         g.posNormal = new(.25f, .25f, .25f);
         SetClassification();
-        // SetClassification2();
         Debug.Log(g.posNormal.x.ToString("F2") + ", " + g.posNormal.y.ToString("F2") + ", " + g.posNormal.z.ToString("F2") + " g.nClassification: " + g.nClassification + "\n");    
     }
 
-    public void CheckFolder(string pathspec)
+    public void AddTally()
+    {
+        g.tally[g.nClassification]++;
+    }
+
+    public void ShowTally()
+    {
+        string txt = "Tally";
+        for(int n = 0; n < g.numClasses; n++)
+        {
+            int v = g.tally[n];
+            txt += "\n" + n + ": " + v + "\t" + new string('|', v);
+        }
+        g.toolsMgr.SetInfo(txt);
+        Debug.Log(txt + "\n");
+    }
+
+    public void CheckAddFolder(string pathspec)
     {
         if (!Directory.Exists(pathspec))
         {
             Directory.CreateDirectory(pathspec);
-            Debug.Log("Created folder at: " + pathspec);
-        }  else
-        {
-            Debug.Log("Existing folder at: " + pathspec);
         }
     }
 
@@ -51,16 +59,15 @@ public class ToolsMgr : MonoBehaviour
 
     void CleanFolder(string pathspec)
     {
-        if (!Directory.Exists(pathspec))
+        if (Directory.Exists(pathspec))
         {
-            //Directory.Delete(pathspec);
-            Debug.Log("Deleted folder at: " + pathspec);
+            Directory.Delete(pathspec, true);
         }
     }
 
     void CreateClassFolder()
     {
-        CheckFolder(g.pathImageData);
+        CheckAddFolder(g.pathImageData);
     }
 
     void CreateClassSubFolders()
@@ -70,35 +77,46 @@ public class ToolsMgr : MonoBehaviour
             g.nClassification = n;
             SetPathClass();
             string pathFolder = Path.Combine(g.pathImageData, g.pathClass);
-            CheckFolder(pathFolder);
+            CheckAddFolder(pathFolder);
         }
     }
 
     public void GrabImage()
     {
-        g.textureGrabbed = g.matDisplay.mainTexture as Texture2D;
+        g.textureGrabbed = RenderTextureToTexture2D(g.renderTexture);
+    }
+
+    public Texture2D RenderTextureToTexture2D(RenderTexture rTex)
+    {
+        RenderTexture currentActiveRT = RenderTexture.active;
+        RenderTexture.active = rTex;
+
+        Texture2D tex = new Texture2D(rTex.width, rTex.height, TextureFormat.RGBA32, false);
+
+        tex.ReadPixels(new Rect(0, 0, rTex.width, rTex.height), 0, 0);
+        tex.Apply();
+
+        RenderTexture.active = currentActiveRT;
+        return tex;
     }
 
     public void SaveImage()
     {
-        g.filename = g.pathClass + ".png";
-        g.filespec = Path.Combine(g.pathImageData, g.pathClass, g.filename);
+        SetFilename();
+        SetFilespec();
         g.bytes = g.textureGrabbed.EncodeToPNG();
         File.WriteAllBytes(g.filespec, g.bytes);
-        Debug.Log("SaveImage: " + g.filespec + "\n");
+        // Debug.Log("SaveImage: " + g.filespec + "\n");
     }
 
-    public void SetClassification2()
+    void SetFilespec()
     {
-        //  6   7   8
-        //  3   4   5
-        //  0   1   2
-        g.nClassification = -1;
-        int s = (int)Mathf.Sqrt(g.numClasses);
-        float ix = (int)(g.posNormal.x * s);
-        float iy = (int)(g.posNormal.y * s);
+        g.filespec = Path.Combine(g.pathImageData, g.pathClass, g.filename);
+    }
 
-        Debug.Log("ix,iy: " + ix + ", " + iy + " g.nClassification: " + g.nClassification + "\n");
+    void SetFilename()
+    {
+        g.filename = "Image-" + g.cntFrames + "-" + g.pathClass + ".png";
     }
 
     public void SetClassification()
@@ -107,57 +125,11 @@ public class ToolsMgr : MonoBehaviour
         //  3   4   5
         //  0   1   2
         g.nClassification = -1;
-        if (g.posNormal.x < .33f)
-        { 
-            if (g.posNormal.y < .33f)
-            {
-                g.nClassification = 0;
-            } else
-            {
-                if (g.posNormal.y < .67f)
-                {
-                    g.nClassification = 3;
-                } else
-                {
-                    g.nClassification = 6;
-                }
-            }         
-        } else
-        {
-            if (g.posNormal.x < .67f)
-            {
-                if (g.posNormal.y < .33f)
-                {
-                    g.nClassification = 1;
-                    
-                } else
-                {
-                    if (g.posNormal.y < .67f)
-                    {
-                        g.nClassification = 4;
-                    } else
-                    {
-                        g.nClassification = 7;
-                    }
-                }         
-            } else
-            {
-                if (g.posNormal.y < .33f)
-                {
-                    g.nClassification = 2;
-                } else
-                {
-                    if (g.posNormal.y < .67f)
-                    {
-                        g.nClassification = 5;
-                    } else
-                    {
-                        g.nClassification = 8;
-                    }
-                }         
-            }
-        }
-        SetPathClass();
+        int side = (int)Mathf.Sqrt(g.numClasses);
+        int ix = (int)(g.posNormal.x * side);
+        int iy = (int)(g.posNormal.y * side);
+        g.nClassification = iy * side + ix;
+        Debug.Log(g.posNormal.ToString("F2") + " SetClassification: ix,iy: " + ix + ", " + iy + " g.nClassification: " + g.nClassification + "\n");
     }
 
     public void SetPathClass()
@@ -165,17 +137,14 @@ public class ToolsMgr : MonoBehaviour
         g.pathClass = "class_" + g.nClassification;
     }
 
-    public Vector3 GetTargetPosition()
+    public void SetPosTarget()
     {
         g.posScreen = GetPosScreen(g.target.transform.position);
         g.posNormal = Normalize(g.posScreen);
 
-        string txt = PosToString(g.posNormal);
-        SetInfo(txt);
-        
-        Vector3 posTarget = GetPosTarget(g.posScreen);
-        return posTarget;
+        g.posTarget = GetPosTarget(g.posScreen);
     } 
+
     Vector3 GetPosTarget(Vector3 posScreen)
     {
         float x = posScreen.x / g.width;
@@ -218,7 +187,7 @@ public class ToolsMgr : MonoBehaviour
         SetInfo(txtInfo);
     }
 
-    void SetInfo(string txt)
+    public void SetInfo(string txt)
     {
         g.textInfo.text = txt;
         // Debug.Log(txt + "\n");

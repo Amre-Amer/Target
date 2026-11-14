@@ -12,7 +12,7 @@ public class DisplayMgr : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        g.posMarker = g.toolsMgr.GetTargetPosition();
+        g.toolsMgr.SetPosTarget();
         g.marker.transform.position = g.posMarker;
     }
 }

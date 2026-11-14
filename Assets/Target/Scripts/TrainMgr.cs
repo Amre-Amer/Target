@@ -6,7 +6,6 @@ public class TrainMgr : MonoBehaviour
 
     public void StartTraining()
     {
-        Debug.Log("StartTraining\n");
         g.toolsMgr.ResetFolders();
     }
 
@@ -14,8 +13,21 @@ public class TrainMgr : MonoBehaviour
     {
         g.toolsMgr.GrabImage();
         g.toolsMgr.SetClassification();
+        g.toolsMgr.AddTally();
         g.toolsMgr.SetPathClass();
         g.toolsMgr.SaveImage();
-        Debug.Log("AddTrainingData\n");
+        g.cntTraining++;
+        SetInfoTraining();
+        if (g.cntTraining == g.maxTraining)
+        {
+            g.ynTraining = false;
+            g.toolsMgr.ShowTally();
+        }
+    }
+
+    void SetInfoTraining()
+    {
+        string txt = "training: " + g.cntTraining + " / " + g.maxTraining;
+        g.toolsMgr.SetInfo(txt);
     }
 }
