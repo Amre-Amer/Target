@@ -31,6 +31,8 @@ public class GlobalsMgr : MonoBehaviour
     public byte[] bytes;
     public bool ynTraining;
     public int maxTraining = 100;
+    public Worker worker;
+    public Tensor<float> inputTensor;
 
     [Header("Display")]
     public Camera camDisplay;
@@ -58,6 +60,7 @@ public class GlobalsMgr : MonoBehaviour
     public int cntFps;
     public TMP_Text textFps;
     public int cntTraining;
+    public int lengthInfo;
 
     void Awake()
     {
@@ -70,7 +73,7 @@ public class GlobalsMgr : MonoBehaviour
         maxTraining = 200;
         radTarget = .5f;
         speedTarget = 2;
-        tally = new int[maxTraining];
+        lengthInfo = 100;
     }
 
     void Start()

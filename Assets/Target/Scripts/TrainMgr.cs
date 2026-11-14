@@ -7,6 +7,7 @@ public class TrainMgr : MonoBehaviour
     public void StartTraining()
     {
         g.toolsMgr.ResetFolders();
+        g.toolsMgr.ClearTally();
     }
 
     public void AddTrainingData()

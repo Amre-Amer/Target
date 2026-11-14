@@ -1,4 +1,5 @@
 using System.IO;
+using System.Linq;
 using UnityEngine;
 
 public class ToolsMgr : MonoBehaviour
@@ -20,9 +21,41 @@ public class ToolsMgr : MonoBehaviour
         Debug.Log(g.posNormal.x.ToString("F2") + ", " + g.posNormal.y.ToString("F2") + ", " + g.posNormal.z.ToString("F2") + " g.nClassification: " + g.nClassification + "\n");    
     }
 
+    public float[] NormalizeArray(float[] array)
+    {
+        float[] result = new float[array.Length];
+        float min = array.Min();
+        float max = array.Max();
+        float range = max - min;
+        for(int n = 0; n < array.Length; n++)
+        {
+            float value = array[n];
+            float norm = (value - min) / range;
+            result[n] = norm;
+        }
+        float sum = result.Sum();
+        for(int n = 0; n < result.Length; n++)
+        {
+            float value = result[n];
+            float norm = value / sum;
+            result[n] = norm;
+        }
+        return result;
+    }
+
+    public void ClearTally()
+    {
+        g.tally = new int[g.numClasses];
+    }
+
     public void AddTally()
     {
         g.tally[g.nClassification]++;
+    }
+
+    public void SetTally(int n, int value)
+    {
+        g.tally[n] = value;
     }
 
     public void ShowTally()
@@ -31,6 +64,7 @@ public class ToolsMgr : MonoBehaviour
         for(int n = 0; n < g.numClasses; n++)
         {
             int v = g.tally[n];
+            Debug.Log("v: " + v + "\n");
             txt += "\n" + n + ": " + v + "\t" + new string('|', v);
         }
         g.toolsMgr.SetInfo(txt);
