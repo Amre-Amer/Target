@@ -5,84 +5,78 @@ from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 
 # 1. Configuration
-DATA_DIR = "./image_data"       # Path to your root image folder
+IMG_SIZE = 14 # 60
+
+DATA_DIR = "./image_data"
 ONNX_PATH = "target.onnx"
-NUM_CLASSES = 9
 BATCH_SIZE = 32
-EPOCHS = 10
-LEARNING_RATE = 0.001
+EPOCHS = 1000
+LEARNING_RATE = 1e-3
+NUM_CLASSES = 9
+CHANNELS = 3  # Change to 1 if using grayscale images
+
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # 2. Data Loading & Preprocessing
-# Resizes images to 60x60 and converts them to [0.0, 1.0] tensors
 transform = transforms.Compose([
-    transforms.Resize((60, 60)),
+    transforms.Resize((IMG_SIZE, IMG_SIZE)),
+    # transforms.Grayscale(num_output_channels=1), # Uncomment if CHANNELS = 1
     transforms.ToTensor(),
-    # Optional: Add normalization if needed, e.g.:
-    # transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
+    transforms.Normalize(mean=[0.5] * CHANNELS, std=[0.5] * CHANNELS)
 ])
 
 dataset = datasets.ImageFolder(root=DATA_DIR, transform=transform)
 dataloader = DataLoader(dataset, batch_size=BATCH_SIZE, shuffle=True)
 
-print(f"Found {len(dataset)} images across {len(dataset.classes)} classes.")
-print(f"Class mapping: {dataset.class_to_idx}")
+print(f"Found {len(dataset)} images across {len(dataset.classes)} classes: {dataset.classes}")
 
-# 3. Lightweight CNN Model for 60x60 RGB Images
-class SimpleCNN(nn.Module):
-    def __init__(self, num_classes=9):
+# 3. Define the MLP Model
+class ImageMLP(nn.Module):
+    def __init__(self, input_dim, num_classes):
         super().__init__()
-        self.features = nn.Sequential(
-            # Input: (3, 60, 60)
-            nn.Conv2d(3, 16, kernel_size=3, padding=1),
-            nn.ReLU(),
-            nn.MaxPool2d(2, 2),  # -> (16, 30, 30)
-
-            nn.Conv2d(16, 32, kernel_size=3, padding=1),
-            nn.ReLU(),
-            nn.MaxPool2d(2, 2),  # -> (32, 15, 15)
-
-            nn.Conv2d(32, 64, kernel_size=3, padding=1),
-            nn.ReLU(),
-            nn.MaxPool2d(2, 2),  # -> (64, 7, 7)
-        )
-        self.classifier = nn.Sequential(
+        self.net = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(64 * 7 * 7, 128),
+            nn.Linear(input_dim, 512),
+            nn.ReLU(),
+            nn.Dropout(0.2),
+            nn.Linear(512, 128),
             nn.ReLU(),
             nn.Linear(128, num_classes)
         )
 
     def forward(self, x):
-        x = self.features(x)
-        return self.classifier(x)
+        return self.net(x)
 
-model = SimpleCNN(num_classes=NUM_CLASSES).to(device)
+input_dim = CHANNELS * IMG_SIZE * IMG_SIZE  # 3 * 60 * 60 = 10,800
+model = ImageMLP(input_dim=input_dim, num_classes=NUM_CLASSES).to(device)
+
+# 4. Loss & Optimizer
 criterion = nn.CrossEntropyLoss()
 optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
 
-# 4. Training Loop
+# 5. Training Loop
 model.train()
 for epoch in range(EPOCHS):
     running_loss = 0.0
     for images, labels in dataloader:
         images, labels = images.to(device), labels.to(device)
-
+        
         optimizer.zero_grad()
         outputs = model(images)
         loss = criterion(outputs, labels)
         loss.backward()
         optimizer.step()
+        
+        running_loss += loss.item() * images.size(0)
+        
+    epoch_loss = running_loss / len(dataset)
+    graph = "|" * int(epoch_loss * 100);
+    print(f"Epoch [{epoch+1}/{EPOCHS}] - Loss: {epoch_loss:.4f}\t{graph}")
 
-        running_loss += loss.item()
-
-    print(f"Epoch [{epoch+1}/{EPOCHS}] - Loss: {running_loss / len(dataloader):.4f}")
-
-# 5. Export to ONNX
+# 6. Export to ONNX
 model.eval()
-# Create dummy input matching (batch_size, channels, height, width)
-dummy_input = torch.randn(1, 3, 60, 60, device=device)
+dummy_input = torch.randn(1, CHANNELS, IMG_SIZE, IMG_SIZE, device=device)
 
 torch.onnx.export(
     model,
@@ -93,10 +87,7 @@ torch.onnx.export(
     do_constant_folding=True,
     input_names=["input"],
     output_names=["output"],
-    dynamic_axes={
-        "input": {0: "batch_size"},
-        "output": {0: "batch_size"}
-    }
+    dynamic_axes={"input": {0: "batch_size"}, "output": {0: "batch_size"}}
 )
 
-print(f"Model successfully exported to {ONNX_PATH}")
+print(f"Model successfully saved to {ONNX_PATH}")

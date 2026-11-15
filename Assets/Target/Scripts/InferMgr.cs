@@ -14,7 +14,7 @@ public class InferMgr : MonoBehaviour
 
         // 2. Allocate a 1x3x60x60 (NCHW) input tensor for an RGB image
         // Change channels to 1 if your model expects grayscale: new TensorShape(1, 1, 60, 60)
-        g.inputTensor = new Tensor<float>(new TensorShape(1, 3, 60, 60));
+        g.inputTensor = new Tensor<float>(new TensorShape(1, 3, g.width, g.height));
     }
 
     public void Infer()

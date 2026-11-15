@@ -18,6 +18,7 @@ public class MainMgr : MonoBehaviour
 
     void Update()
     {
+        g.targetMgr.AnimateTarget();        
         if (g.ynTrain)
         {
             if (g.ynTraining)
@@ -28,6 +29,7 @@ public class MainMgr : MonoBehaviour
         {
             g.inferMgr.Infer();
         }
+        g.displayMgr.UpdateMarker();
     }
 
     void StartTraining()

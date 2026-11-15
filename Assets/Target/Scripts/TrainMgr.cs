@@ -14,6 +14,11 @@ public class TrainMgr : MonoBehaviour
     {
         g.toolsMgr.GrabImage();
         g.toolsMgr.SetClassification();
+        if (g.nClassification < 0 || g.nClassification >= g.numClasses)
+        {
+            Debug.Log("skipped: g.nClassification = " + g.nClassification + "\n");
+            return;
+        }
         g.toolsMgr.AddTally();
         g.toolsMgr.SetPathClass();
         g.toolsMgr.SaveImage();
@@ -24,6 +29,9 @@ public class TrainMgr : MonoBehaviour
             g.ynTraining = false;
             g.toolsMgr.ShowTally();
         }
+        // shouldn't this be the data
+        // maybe encode in image or switch to text files ?
+        g.toolsMgr.SetPosNormalized();
     }
 
     void SetInfoTraining()

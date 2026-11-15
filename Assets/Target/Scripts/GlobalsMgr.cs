@@ -15,9 +15,10 @@ public class GlobalsMgr : MonoBehaviour
 
     [Header("Inference")]
     public bool ynTrain;
-    public int width = 60;
-    public int height = 60;
     public float depth = 3;
+    public int size;
+    public int width;
+    public int height;
     public int numClasses = 9; //100;
     public int sizeOutput;
     public int sizeInput;
@@ -45,7 +46,7 @@ public class GlobalsMgr : MonoBehaviour
     public Vector3 posMarker;
     public Vector3 posTarget;
     public Vector3 posScreen;
-    public Vector3 posNormal;
+    public Vector3 posNormalized;
     public float radTarget;
     public float speedTarget;
     public float angTarget;
@@ -64,16 +65,20 @@ public class GlobalsMgr : MonoBehaviour
 
     void Awake()
     {
+        size = 14;
+        maxTraining = 1000;
+
         pathImageDataFolder = "image_data";
-        pathImageData = Path.Combine(Application.dataPath, "Target/Python/", pathImageDataFolder);
-        width = 60;
-        height = 60;
+        pathImageData = Path.Combine(Application.dataPath, "Target/Python/", pathImageDataFolder);        
+        width = size; //60;
+        height = size; //60;
         depth = 3;
         numClasses = 9; //100;
-        maxTraining = 200;
         radTarget = .5f;
         speedTarget = 2;
         lengthInfo = 100;
+        renderTexture.width = width;
+        renderTexture.height = height;
     }
 
     void Start()

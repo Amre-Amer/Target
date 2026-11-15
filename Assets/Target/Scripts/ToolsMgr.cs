@@ -8,17 +8,17 @@ public class ToolsMgr : MonoBehaviour
 
     void TestClassification()
     {
-        g.posNormal = new(.5f, .5f, .5f);
+        g.posNormalized = new(.5f, .5f, .5f);
         SetClassification();
-        Debug.Log(g.posNormal.x.ToString("F2") + ", " + g.posNormal.y.ToString("F2") + ", " + g.posNormal.z.ToString("F2") + " g.nClassification: " + g.nClassification + "\n");    
+        Debug.Log(g.posNormalized.x.ToString("F2") + ", " + g.posNormalized.y.ToString("F2") + ", " + g.posNormalized.z.ToString("F2") + " g.nClassification: " + g.nClassification + "\n");    
 
-        g.posNormal = new(.95f, .95f, .95f);
+        g.posNormalized = new(.95f, .95f, .95f);
         SetClassification();
-        Debug.Log(g.posNormal.x.ToString("F2") + ", " + g.posNormal.y.ToString("F2") + ", " + g.posNormal.z.ToString("F2") + " g.nClassification: " + g.nClassification + "\n");    
+        Debug.Log(g.posNormalized.x.ToString("F2") + ", " + g.posNormalized.y.ToString("F2") + ", " + g.posNormalized.z.ToString("F2") + " g.nClassification: " + g.nClassification + "\n");    
 
-        g.posNormal = new(.25f, .25f, .25f);
+        g.posNormalized = new(.25f, .25f, .25f);
         SetClassification();
-        Debug.Log(g.posNormal.x.ToString("F2") + ", " + g.posNormal.y.ToString("F2") + ", " + g.posNormal.z.ToString("F2") + " g.nClassification: " + g.nClassification + "\n");    
+        Debug.Log(g.posNormalized.x.ToString("F2") + ", " + g.posNormalized.y.ToString("F2") + ", " + g.posNormalized.z.ToString("F2") + " g.nClassification: " + g.nClassification + "\n");    
     }
 
     public float[] NormalizeArray(float[] array)
@@ -160,10 +160,10 @@ public class ToolsMgr : MonoBehaviour
         //  0   1   2
         g.nClassification = -1;
         int side = (int)Mathf.Sqrt(g.numClasses);
-        int ix = (int)(g.posNormal.x * side);
-        int iy = (int)(g.posNormal.y * side);
+        int ix = (int)(g.posNormalized.x * side);
+        int iy = (int)(g.posNormalized.y * side);
         g.nClassification = iy * side + ix;
-        Debug.Log(g.posNormal.ToString("F2") + " SetClassification: ix,iy: " + ix + ", " + iy + " g.nClassification: " + g.nClassification + "\n");
+        Debug.Log(g.posNormalized.ToString("F2") + " SetClassification: ix,iy: " + ix + ", " + iy + " g.nClassification: " + g.nClassification + "\n");
     }
 
     public void SetPathClass()
@@ -171,15 +171,28 @@ public class ToolsMgr : MonoBehaviour
         g.pathClass = "class_" + g.nClassification;
     }
 
-    public void SetPosTarget()
+    // public void SetPosTarget()
+    // {
+    //     g.posTarget = GetPosTarget(g.posScreen);
+    // } 
+
+    public void SetPosScreen()
     {
-        g.posScreen = GetPosScreen(g.target.transform.position);
-        g.posNormal = Normalize(g.posScreen);
+        g.posScreen = GetPosScreen(g.target.transform.position);        
+    }
 
-        g.posTarget = GetPosTarget(g.posScreen);
-    } 
+    public void SetPosNormalized()
+    {
+        g.posNormalized = Normalize(g.posScreen);
+        // Debug.Log("g.posNormalized: " + g.posNormalized.ToString("F2"));
+    }
 
-    Vector3 GetPosTarget(Vector3 posScreen)
+    public void SetPosMarker()
+    {
+       g.posMarker = GetPosMarker(g.posScreen);
+    }
+
+    Vector3 GetPosMarker(Vector3 posScreen)
     {
         float x = posScreen.x / g.width;
         float y = posScreen.y / g.height;

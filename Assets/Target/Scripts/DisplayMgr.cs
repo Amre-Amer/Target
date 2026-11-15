@@ -4,15 +4,10 @@ public class DisplayMgr : MonoBehaviour
 {
     public GlobalsMgr g;
 
-    void Start()
+    public void UpdateMarker()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        g.toolsMgr.SetPosTarget();
+        g.toolsMgr.SetPosScreen();
+        g.toolsMgr.SetPosMarker();
         g.marker.transform.position = g.posMarker;
     }
 }

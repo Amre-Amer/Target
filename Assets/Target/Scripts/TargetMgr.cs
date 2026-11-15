@@ -9,12 +9,12 @@ public class TargetMgr : MonoBehaviour
         g.centerTarget = g.target.transform.position;
     }
 
-    void Update()
-    {
-        AnimateNext();        
-    }
+    // void Update()
+    // {
+    //     AnimateTarget();        
+    // }
 
-    public void AnimateNext()
+    public void AnimateTarget()
     {
         float x = g.centerTarget.x + g.radTarget * Mathf.Cos(g.angTarget * Mathf.Deg2Rad);
         float y = g.centerTarget.y + g.radTarget * Mathf.Sin(g.angTarget * Mathf.Deg2Rad);
