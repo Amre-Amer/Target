@@ -1503,11 +1503,13 @@ MonoBehaviour:
   trainMgr: {fileID: 1868476488}
   inferMgr: {fileID: 1539658145}
   targetMgr: {fileID: 2122844552}
-  displayMgr: {fileID: 1126209619}
-  ynTrain: 0
+  markerMgr: {fileID: 1749939672}
+  mode: 0
+  ynAnimateTarget: 1
   depth: 3
-  width: 60
-  height: 60
+  side: 0
+  width: 0
+  height: 0
   numClasses: 9
   sizeOutput: 0
   sizeInput: 0
@@ -1521,6 +1523,7 @@ MonoBehaviour:
   bytes: 
   ynTraining: 0
   maxTraining: 100
+  normsOutput: []
   camDisplay: {fileID: 388650559}
   renderTexture: {fileID: 8400000, guid: d22b60504d75dd5498d52151541dadcb, type: 2}
   textInfo: {fileID: 1312914012}
@@ -1567,7 +1570,6 @@ GameObject:
   - component: {fileID: 1126209615}
   - component: {fileID: 1126209618}
   - component: {fileID: 1126209617}
-  - component: {fileID: 1126209619}
   m_Layer: 0
   m_Name: Display
   m_TagString: Untagged
@@ -1650,19 +1652,6 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1126209614}
   m_Mesh: {fileID: 10210, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &1126209619
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1126209614}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b4dbb19716d9b3145afc25c3c5ca4c62, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DisplayMgr
-  g: {fileID: 1008131556}
 --- !u!1 &1215703440
 GameObject:
   m_ObjectHideFlags: 0
@@ -2048,7 +2037,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: a2d8dc961575f474f9f324cdb44b5059, type: 2}
+  - {fileID: 2100000, guid: 47c6893b70a8a5d4f88e7321cabac216, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2360,6 +2349,7 @@ GameObject:
   - component: {fileID: 1749939668}
   - component: {fileID: 1749939671}
   - component: {fileID: 1749939670}
+  - component: {fileID: 1749939672}
   m_Layer: 0
   m_Name: Marker
   m_TagString: Untagged
@@ -2377,7 +2367,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -0.363, y: 0.896, z: 0}
-  m_LocalScale: {x: 0.05, y: 0.05, z: 0.05}
+  m_LocalScale: {x: 0.25, y: 0.25, z: 0.25}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
@@ -2439,6 +2429,19 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1749939667}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1749939672
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1749939667}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b4dbb19716d9b3145afc25c3c5ca4c62, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DisplayMgr
+  g: {fileID: 1008131556}
 --- !u!1 &1868476487
 GameObject:
   m_ObjectHideFlags: 0

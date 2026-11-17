@@ -6,30 +6,43 @@ public class MainMgr : MonoBehaviour
 
     void Start()
     {
-        if (g.ynTrain)
+        switch (g.mode)
         {
-            g.trainMgr.StartTraining();
-            Invoke(nameof(StartTraining), 1);
-        } else
-        {
-            g.inferMgr.StartInference();
+            case ModeType.none:
+                break;
+            case ModeType.train:
+                g.trainMgr.StartTraining();
+                Invoke(nameof(StartTraining), 1);
+                break;
+            case ModeType.infer:
+                g.inferMgr.StartInference();
+                break;
         }
     }
 
     void Update()
     {
         g.targetMgr.AnimateTarget();        
-        if (g.ynTrain)
+        TrainOrInfer();
+        g.markerMgr.UpdateMarker();
+    }
+
+    void TrainOrInfer()
+    {
+        switch (g.mode)
         {
-            if (g.ynTraining)
-            {
-                g.trainMgr.AddTrainingData();
-            }
-        } else
-        {
-            g.inferMgr.Infer();
+            case ModeType.none:
+                break;
+            case ModeType.train:
+                if (g.ynTraining)
+                {
+                    g.trainMgr.AddTrainingData();
+                }
+                break;
+            case ModeType.infer:
+                g.inferMgr.Inference();
+                break;
         }
-        g.displayMgr.UpdateMarker();
     }
 
     void StartTraining()

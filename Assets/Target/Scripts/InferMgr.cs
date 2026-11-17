@@ -17,29 +17,30 @@ public class InferMgr : MonoBehaviour
         g.inputTensor = new Tensor<float>(new TensorShape(1, 3, g.width, g.height));
     }
 
-    public void Infer()
+    public void Inference()
     {
         g.toolsMgr.GrabImage();
-        Inference();
-    }
-
-    void Inference()
-    {
         TextureConverter.ToTensor(g.textureGrabbed, g.inputTensor);
         g.worker.Schedule(g.inputTensor);
         Tensor<float> outputTensor = g.worker.PeekOutput() as Tensor<float>;
 
         float[] output = outputTensor.ReadbackAndClone().DownloadToArray();
-        float[] norms = g.toolsMgr.NormalizeArray(output);
+        g.normsOutput = g.toolsMgr.NormalizeArray(output);
+        
+        g.toolsMgr.SetClassificationFromInference();
+
+        ShowTallyInference();
+    }
+
+    void ShowTallyInference()
+    {
         g.toolsMgr.ClearTally();
-        for (int n = 0; n < norms.Length; n++)
+        for (int n = 0; n < g.normsOutput.Length; n++)
         {
-            float value = norms[n];
+            float value = g.normsOutput[n];
             int v = (int)(value * g.lengthInfo);
             g.toolsMgr.SetTally(n, v);
         }
-        float max = norms.Max();
-        g.nClassification = Array.IndexOf(norms, max);
         g.toolsMgr.ShowTally();
     }
 

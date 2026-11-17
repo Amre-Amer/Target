@@ -13,7 +13,7 @@ public class TrainMgr : MonoBehaviour
     public void AddTrainingData()
     {
         g.toolsMgr.GrabImage();
-        g.toolsMgr.SetClassification();
+        g.toolsMgr.SetClassificationFromSimulator();
         if (g.nClassification < 0 || g.nClassification >= g.numClasses)
         {
             Debug.Log("skipped: g.nClassification = " + g.nClassification + "\n");

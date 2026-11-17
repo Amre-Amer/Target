@@ -11,15 +11,16 @@ public class GlobalsMgr : MonoBehaviour
     public TrainMgr trainMgr;
     public InferMgr inferMgr;
     public TargetMgr targetMgr;
-    public DisplayMgr displayMgr;
+    public MarkerMgr markerMgr;
 
     [Header("Inference")]
-    public bool ynTrain;
-    public float depth = 3;
-    public int size;
+    public ModeType mode;
+    public bool ynAnimateTarget;
+    public float depth;
+    public int side;
     public int width;
     public int height;
-    public int numClasses = 9; //100;
+    public int numClasses;
     public int sizeOutput;
     public int sizeInput;
     public ModelAsset model;
@@ -34,6 +35,7 @@ public class GlobalsMgr : MonoBehaviour
     public int maxTraining = 100;
     public Worker worker;
     public Tensor<float> inputTensor;
+    public float[] normsOutput;
 
     [Header("Display")]
     public Camera camDisplay;
@@ -65,15 +67,15 @@ public class GlobalsMgr : MonoBehaviour
 
     void Awake()
     {
-        size = 14;
-        maxTraining = 1000;
+        side = 28; // 14;
+        maxTraining = 100; // 1000;
 
         pathImageDataFolder = "image_data";
         pathImageData = Path.Combine(Application.dataPath, "Target/Python/", pathImageDataFolder);        
-        width = size; //60;
-        height = size; //60;
+        width = side; //60;
+        height = side; //60;
         depth = 3;
-        numClasses = 9; //100;
+        numClasses = side * side; // 9; //100;
         radTarget = .5f;
         speedTarget = 2;
         lengthInfo = 100;
@@ -97,5 +99,12 @@ public class GlobalsMgr : MonoBehaviour
         textFps.text = "fps: " + cntFps;
         cntFps = 0;
     }
+}
+
+public enum ModeType
+{
+    none,
+    train,
+    infer
 }
 

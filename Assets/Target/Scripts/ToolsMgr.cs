@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Linq;
 using UnityEngine;
@@ -6,19 +7,45 @@ public class ToolsMgr : MonoBehaviour
 {
     public GlobalsMgr g;
 
-    void TestClassification()
+    public void SetPosMarkerFromNClassification()
     {
-        g.posNormalized = new(.5f, .5f, .5f);
-        SetClassification();
-        Debug.Log(g.posNormalized.x.ToString("F2") + ", " + g.posNormalized.y.ToString("F2") + ", " + g.posNormalized.z.ToString("F2") + " g.nClassification: " + g.nClassification + "\n");    
+        float x = g.nClassification % g.side;
+        float y = g.nClassification / g.side;
+        float z = 0;
+        x += .5f;
+        y += .5f;
+        x /= g.side;
+        y /= g.side;
+        x -= .5f;
+        y -= .5f;
+        g.posMarker = g.camDisplay.transform.TransformPoint(x, y, z);
+    }
 
-        g.posNormalized = new(.95f, .95f, .95f);
-        SetClassification();
-        Debug.Log(g.posNormalized.x.ToString("F2") + ", " + g.posNormalized.y.ToString("F2") + ", " + g.posNormalized.z.ToString("F2") + " g.nClassification: " + g.nClassification + "\n");    
+    public void SetPosMarkerFromPosTarget()
+    {
+        g.toolsMgr.SetPosScreen();
+        g.toolsMgr.SetPosMarker();
+    }
 
-        g.posNormalized = new(.25f, .25f, .25f);
-        SetClassification();
-        Debug.Log(g.posNormalized.x.ToString("F2") + ", " + g.posNormalized.y.ToString("F2") + ", " + g.posNormalized.z.ToString("F2") + " g.nClassification: " + g.nClassification + "\n");    
+    public void SetClassificationFromSimulator()
+    {
+        //  6   7   8
+        //  3   4   5
+        //  0   1   2
+        g.nClassification = -1;
+        int ix = (int)(g.posNormalized.x * g.side);
+        int iy = (int)(g.posNormalized.y * g.side);
+        if (ix == g.side) ix = g.side - 1;
+        if (iy == g.side) iy = g.side - 1;
+        g.nClassification = iy * g.side + ix;
+        Debug.Log(g.posNormalized.ToString("F2") + " SetClassification: ix,iy: " + ix + ", " + iy + " g.nClassification: " + g.nClassification + "\n");
+    }
+
+    public void SetClassificationFromInference()
+    {
+        float max = g.normsOutput.Max();
+        g.nClassification = Array.IndexOf(g.normsOutput, max);
+        Debug.Log("SetClassificationFromInference: " + g.nClassification + "\n");
     }
 
     public float[] NormalizeArray(float[] array)
@@ -64,7 +91,7 @@ public class ToolsMgr : MonoBehaviour
         for(int n = 0; n < g.numClasses; n++)
         {
             int v = g.tally[n];
-            Debug.Log("v: " + v + "\n");
+//            Debug.Log("v: " + v + "\n");
             txt += "\n" + n + ": " + v + "\t" + new string('|', v);
         }
         g.toolsMgr.SetInfo(txt);
@@ -151,19 +178,6 @@ public class ToolsMgr : MonoBehaviour
     void SetFilename()
     {
         g.filename = "Image-" + g.cntFrames + "-" + g.pathClass + ".png";
-    }
-
-    public void SetClassification()
-    {
-        //  6   7   8
-        //  3   4   5
-        //  0   1   2
-        g.nClassification = -1;
-        int side = (int)Mathf.Sqrt(g.numClasses);
-        int ix = (int)(g.posNormalized.x * side);
-        int iy = (int)(g.posNormalized.y * side);
-        g.nClassification = iy * side + ix;
-        Debug.Log(g.posNormalized.ToString("F2") + " SetClassification: ix,iy: " + ix + ", " + iy + " g.nClassification: " + g.nClassification + "\n");
     }
 
     public void SetPathClass()

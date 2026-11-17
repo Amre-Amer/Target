@@ -5,13 +5,15 @@ from torch.utils.data import DataLoader
 from torchvision import datasets, transforms
 
 # 1. Configuration
-IMG_SIZE = 14 # 60
+IMG_SIZE = 28 #3 # 14 # 60
 
 DATA_DIR = "./image_data"
 ONNX_PATH = "target.onnx"
 BATCH_SIZE = 32
-EPOCHS = 1000
+EPOCHS = 1000 # 1000
 LEARNING_RATE = 1e-3
+HIDDEN_LAYER_0 = 512
+HIDDEN_LAYER_1 = 128
 NUM_CLASSES = 9
 CHANNELS = 3  # Change to 1 if using grayscale images
 
@@ -37,12 +39,12 @@ class ImageMLP(nn.Module):
         super().__init__()
         self.net = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(input_dim, 512),
+            nn.Linear(input_dim, HIDDEN_LAYER_0),
             nn.ReLU(),
             nn.Dropout(0.2),
-            nn.Linear(512, 128),
+            nn.Linear(HIDDEN_LAYER_0, HIDDEN_LAYER_1),
             nn.ReLU(),
-            nn.Linear(128, num_classes)
+            nn.Linear(HIDDEN_LAYER_1, num_classes)
         )
 
     def forward(self, x):
